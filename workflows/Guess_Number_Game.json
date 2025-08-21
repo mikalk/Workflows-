@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "f4681a80-5872-49f3-a7e5-3fa84ca82c2b",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "path": "guess-number-game",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "typeVersion": 1,
+      "webhookId": "42737f46-d898-44fc-b126-b214c9e34fdb"
+    },
+    {
+      "id": "4894a1b6-4bfb-44b6-85f1-e6787efdacaa",
+      "name": "Check Guess",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {
+        "functionCode": "const guess = parseInt($json[\"query\"].guess, 10);\nconst target = Math.floor(Math.random() * 10) + 1;\nconst message = guess === target ? `You win! ${guess} was correct.` : `Try again! I picked ${target}.`;\nreturn [{json: {message}}];"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a8e20d53-1cfe-438a-abb2-12f5a606afcd",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        720,
+        300
+      ],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{$json[\"message\"]}}"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Guess",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Guess": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
